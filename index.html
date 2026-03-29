@@ -393,18 +393,17 @@
       btn.textContent = 'Submitting...';
 
       try {
+        const formData = new URLSearchParams();
+        formData.append('rating', selectedRating);
+        formData.append('device', selectedDevice || 'Not specified');
+        formData.append('comment', document.getElementById('comment').value.trim() || 'No comment');
+        formData.append('email', document.getElementById('email').value.trim() || 'Not provided');
+
         await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            rating: selectedRating,
-            device: selectedDevice || 'Not specified',
-            comment: document.getElementById('comment').value.trim() || 'No comment',
-            email: document.getElementById('email').value.trim() || 'Not provided',
-          }),
+          body: formData,
         });
-        // no-cors = opaque response, but if no error thrown, it went through
         document.getElementById('form-container').classList.add('hidden');
         document.getElementById('thank-you').classList.remove('hidden');
       } catch {
