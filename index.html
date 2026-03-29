@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>905 Newsletter Feedback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=IBM+Plex+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F5F0E8;
+      --fg: #1A1A1A;
+      --red: #8B1A1A;
+      --paper: #FAF7F2;
+      --paper-mid: #EDE8DE;
+      --muted: rgba(26,26,26,0.45);
+      --faint: rgba(26,26,26,0.10);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Faint paper grain */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo {
+      width: 140px;
+      height: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: var(--muted);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    /* Form */
+    .form { display: flex; flex-direction: column; gap: 2rem; }
+
+    .field label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* Rating */
+    .rating-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: space-between;
+    }
+
+    .rating-btn {
+      flex: 1;
+      aspect-ratio: 1;
+      max-width: 42px;
+      border-radius: 0.5rem;
+      border: 1px solid var(--faint);
+      background: var(--paper);
+      color: var(--fg);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .rating-btn:hover { background: var(--paper-mid); }
+
+    .rating-btn.active {
+      background: var(--red);
+      color: white;
+      border-color: var(--red);
+      transform: scale(1.1);
+      box-shadow: 0 2px 8px rgba(139,26,26,0.25);
+    }
+
+    .rating-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.375rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 0.03em;
+    }
+
+    /* Device buttons */
+    .device-row { display: flex; gap: 0.75rem; }
+
+    .device-btn {
+      flex: 1;
+      padding: 0.625rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--faint);
+      background: var(--paper);
+      color: var(--fg);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .device-btn:hover { background: var(--paper-mid); }
+
+    .device-btn.active {
+      background: var(--fg);
+      color: var(--bg);
+      border-color: var(--fg);
+    }
+
+    /* Text inputs */
+    textarea, input[type="email"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--faint);
+      background: var(--paper);
+      color: var(--fg);
+      font-size: 0.875rem;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    textarea:focus, input[type="email"]:focus {
+      border-color: rgba(139,26,26,0.4);
+      box-shadow: 0 0 0 3px rgba(139,26,26,0.08);
+    }
+
+    textarea::placeholder, input::placeholder {
+      color: rgba(26,26,26,0.28);
+    }
+
+    textarea { min-height: 80px; }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%;
+      padding: 0.875rem;
+      border-radius: 0.5rem;
+      border: none;
+      background: var(--red);
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+
+    .submit-btn:hover { opacity: 0.9; }
+    .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      font-size: 0.7rem;
+      color: rgba(26,26,26,0.25);
+      font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 0.05em;
+    }
+
+    /* States */
+    .state-screen {
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+
+    .state-screen .icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .state-screen h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .state-screen p {
+      color: var(--muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .error-msg {
+      font-size: 0.8rem;
+      color: #b91c1c;
+      margin-top: -0.5rem;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Not Found screen -->
+    <div id="not-found" class="state-screen hidden">
+      <h2>Page not found</h2>
+      <p>The page you're looking for doesn't exist.</p>
+    </div>
+
+    <!-- Thank You screen -->
+    <div id="thank-you" class="state-screen hidden">
+      <div class="icon">&#10003;</div>
+      <h2>Thank you!</h2>
+      <p>Your feedback helps us shape a better 905. We appreciate you taking the time.</p>
+    </div>
+
+    <!-- Form -->
+    <div id="form-container" class="hidden">
+      <div class="header">
+        <svg class="logo" viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="905 — Bridging Europe's ambition gap">
+          <g transform="translate(20, 12)">
+            <circle cx="42" cy="36" r="32" fill="none" stroke="#1a1a1a" stroke-width="5.5" stroke-linecap="round"/>
+            <line x1="74" y1="36" x2="64" y2="115" stroke="#1a1a1a" stroke-width="5.5" stroke-linecap="round"/>
+          </g>
+          <g transform="translate(130, 12)">
+            <ellipse cx="40" cy="58" rx="32" ry="50" fill="none" stroke="#8B1A1A" stroke-width="5" stroke-linecap="round"/>
+          </g>
+          <g transform="translate(245, 12)">
+            <line x1="8" y1="8" x2="65" y2="8" stroke="#1a1a1a" stroke-width="5.5" stroke-linecap="round"/>
+            <line x1="8" y1="8" x2="8" y2="50" stroke="#1a1a1a" stroke-width="5.5" stroke-linecap="round"/>
+            <path d="M 8 50 C 8 50, 42 38, 65 55 C 88 72, 68 112, 10 105" fill="none" stroke="#1a1a1a" stroke-width="5.5" stroke-linecap="round"/>
+          </g>
+          <text x="200" y="160" text-anchor="middle"
+            font-family="'IBM Plex Mono', 'Courier New', monospace"
+            font-size="10" font-weight="400" fill="#6b6e73"
+            letter-spacing="0.22em"
+            style="text-transform: uppercase; letter-spacing: 0.22em;">BRIDGING EUROPE'S AMBITION GAP</text>
+        </svg>
+        <h1>Help us improve the newsletter</h1>
+        <p>We've redesigned the 905 newsletter and would love to hear what you think.</p>
+      </div>
+
+      <form class="form" onsubmit="submitFeedback(event)">
+        <!-- Rating -->
+        <div class="field">
+          <label>How would you rate the new layout?</label>
+          <div class="rating-row" id="rating-row"></div>
+          <div class="rating-labels">
+            <span>Needs work</span>
+            <span>Excellent</span>
+          </div>
+        </div>
+
+        <!-- Device -->
+        <div class="field">
+          <label>Where do you usually read the newsletter?</label>
+          <div class="device-row">
+            <button type="button" class="device-btn" onclick="selectDevice(this, 'Mobile')">Mobile</button>
+            <button type="button" class="device-btn" onclick="selectDevice(this, 'Desktop')">Desktop</button>
+            <button type="button" class="device-btn" onclick="selectDevice(this, 'Both')">Both</button>
+          </div>
+        </div>
+
+        <!-- Comment -->
+        <div class="field">
+          <label>What would make the newsletter more valuable to you?</label>
+          <textarea id="comment" rows="3" placeholder="Your thoughts..."></textarea>
+        </div>
+
+        <!-- Email -->
+        <div class="field">
+          <label>Your email <span class="hint">(optional)</span></label>
+          <input type="email" id="email" placeholder="you@example.com">
+        </div>
+
+        <p id="error-msg" class="error-msg hidden">Something went wrong. Please try again.</p>
+
+        <button type="submit" class="submit-btn" id="submit-btn" disabled>Submit Feedback</button>
+      </form>
+
+      <p class="footer">905 &mdash; European Tech Fundraising</p>
+    </div>
+  </div>
+
+  <script>
+    // --- Config ---
+    const VALID_TOKEN = 'n905fb2026';
+    const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
+    // --- State ---
+    let selectedRating = null;
+    let selectedDevice = '';
+
+    // --- Token gate ---
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('t') !== VALID_TOKEN) {
+      document.getElementById('not-found').classList.remove('hidden');
+    } else {
+      document.getElementById('form-container').classList.remove('hidden');
+      buildRating();
+    }
+
+    // --- Rating buttons ---
+    function buildRating() {
+      const row = document.getElementById('rating-row');
+      for (let i = 1; i <= 10; i++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'rating-btn';
+        btn.textContent = i;
+        btn.addEventListener('click', () => selectRating(i));
+        row.appendChild(btn);
+      }
+    }
+
+    function selectRating(n) {
+      selectedRating = n;
+      document.querySelectorAll('.rating-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx + 1 === n);
+      });
+      updateSubmit();
+    }
+
+    function selectDevice(btn, value) {
+      selectedDevice = value;
+      document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function updateSubmit() {
+      document.getElementById('submit-btn').disabled = !selectedRating;
+    }
+
+    // --- Submit ---
+    async function submitFeedback(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const errMsg = document.getElementById('error-msg');
+      errMsg.classList.add('hidden');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            rating: selectedRating,
+            device: selectedDevice || 'Not specified',
+            comment: document.getElementById('comment').value.trim() || 'No comment',
+            email: document.getElementById('email').value.trim() || 'Not provided',
+          }),
+        });
+        // no-cors = opaque response, but if no error thrown, it went through
+        document.getElementById('form-container').classList.add('hidden');
+        document.getElementById('thank-you').classList.remove('hidden');
+      } catch {
+        errMsg.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Submit Feedback';
+      }
+    }
+  </script>
+</body>
+</html>
